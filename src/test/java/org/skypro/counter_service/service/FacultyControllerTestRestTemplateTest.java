@@ -1,4 +1,4 @@
-package tests;
+package org.skypro.counter_service.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

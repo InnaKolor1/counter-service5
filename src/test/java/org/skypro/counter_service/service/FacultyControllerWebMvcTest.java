@@ -1,4 +1,4 @@
-package tests;
+package org.skypro.counter_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import org.skypro.counter_service.controller.FacultyController;
 import org.skypro.counter_service.model.Faculty;
-import org.skypro.counter_service.service.FacultyService;
+
 import java.util.Collections;
 
 @WebMvcTest(FacultyController.class)
@@ -60,4 +60,3 @@ public class FacultyControllerWebMvcTest {
     }
 
 }
-

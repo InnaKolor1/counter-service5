@@ -1,4 +1,4 @@
-package tests;
+package org.skypro.counter_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import org.skypro.counter_service.controller.StudentController;
 import org.skypro.counter_service.model.Student;
-import org.skypro.counter_service.service.StudentService;
+
 import java.util.Collections;
 
 @WebMvcTest(StudentController.class)
