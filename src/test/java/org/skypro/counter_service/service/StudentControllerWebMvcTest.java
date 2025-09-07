@@ -2,7 +2,7 @@ package org.skypro.counter_service.service;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
+import org.mockito.MockitoBean;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,7 +21,7 @@ public class StudentControllerWebMvcTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockitoBean
     private StudentService studentService;
 
     @Test
