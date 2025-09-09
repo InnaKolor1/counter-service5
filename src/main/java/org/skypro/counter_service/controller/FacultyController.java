@@ -1,10 +1,7 @@
 package org.skypro.counter_service.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.skypro.counter_service.model.Faculty;
 import org.skypro.counter_service.service.FacultyService;
@@ -19,8 +16,43 @@ public class FacultyController {
         this.facultyService = facultyService;
     }
 
+    @PostMapping
+    public Faculty create(@RequestBody Faculty faculty) {
+        return facultyService.create(faculty);
+    }
+
+    @GetMapping("/{id}")
+    public Faculty read(@PathVariable long id) {
+        return facultyService.read(id);
+    }
+
+    @PutMapping
+    public Faculty update(@RequestBody Faculty faculty) {
+        return facultyService.update(faculty);
+    }
+
+    @DeleteMapping("/{id}")
+    public Faculty delete(@PathVariable long id) {
+        return facultyService.delete(id);
+    }
+
+    @GetMapping("/by-color")
+    public List<Faculty> getByColor(@RequestParam String color) {
+        return facultyService.getByColor(color);
+    }
+
+    @GetMapping("/by-name")
+    public List<Faculty> getByName(@RequestParam String name) {
+        return facultyService.getByName(name);
+    }
+
     @GetMapping("/search")
-    public ResponseEntity<List<Faculty>> searchByNameOrColor(@RequestParam String nameOrColor) {
-        return ResponseEntity.ok(facultyService.findByNameOrColor(nameOrColor));
+    public List<Faculty> searchByNameOrColor(@RequestParam String nameOrColor) {
+        return facultyService.findByNameOrColor(nameOrColor);
+    }
+
+    @GetMapping
+    public List<Faculty> getAll() {
+        return facultyService.getAll();
     }
 }

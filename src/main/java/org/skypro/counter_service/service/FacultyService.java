@@ -3,8 +3,9 @@ package org.skypro.counter_service.service;
 import org.springframework.stereotype.Service;
 
 import org.skypro.counter_service.model.Faculty;
-import org.skypro.counter_service.repository.FacultyRepository;
+import org.skypro.counter_service.resources.FacultyRepository;
 import java.util.List;
+
 
 
 @Service
@@ -15,23 +16,43 @@ public class FacultyService {
         this.facultyRepository = facultyRepository;
     }
 
-    public List<Faculty> findByName(String name) {
-        return facultyRepository.findByNameIgnoreCase(name);
+    public Faculty create(Faculty faculty) {
+        return facultyRepository.save(faculty);
+
+
     }
 
-    public List<Faculty> findByColor(String color) {
-        return facultyRepository.findByColorIgnoreCase(color);
+    public Faculty read(long id) {
+        return facultyRepository.findById(id).orElse(null);
     }
 
-    public List<Faculty> findByNameOrColor(String name) {
-        return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(name, name);
+    public Faculty update(Faculty faculty) {
+        return facultyRepository.save(faculty);
+
+
     }
 
-    public List<Faculty> searchByName(String part) {
-        return facultyRepository.findByNameContainingIgnoreCase(part);
+    public Faculty delete(long id) {
+        Faculty faculty = read(id);
+        if (faculty != null) {
+            facultyRepository.deleteById(id);
+        }
+        return faculty;
     }
 
-    public List<Faculty> searchByNameOrColor(String part) {
-        return facultyRepository.findByNameContainingIgnoreCaseOrColorContainingIgnoreCase(part, part);
+    public List<Faculty> getByColor(String color) {
+        return facultyRepository.findByColor(color);
+    }
+
+    public List<Faculty> getByName(String name) {
+        return facultyRepository.findByName(name);
+    }
+
+    public List<Faculty> findByNameOrColor(String nameOrColor) {
+        return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor);
+    }
+
+    public List<Faculty> getAll() {
+        return facultyRepository.findAll();
     }
 }

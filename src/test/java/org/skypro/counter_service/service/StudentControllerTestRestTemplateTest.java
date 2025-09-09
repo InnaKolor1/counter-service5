@@ -12,8 +12,8 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import org.skypro.counter_service.model.Faculty;
 import org.skypro.counter_service.model.Student;
-import org.skypro.counter_service.repository.FacultyRepository;
-import org.skypro.counter_service.repository.StudentRepository;
+import org.skypro.counter_service.resources.FacultyRepository;
+import org.skypro.counter_service.resources.StudentRepository;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

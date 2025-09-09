@@ -1,4 +1,4 @@
-package org.skypro.counter_service.repository;
+package org.skypro.counter_service.resources;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
