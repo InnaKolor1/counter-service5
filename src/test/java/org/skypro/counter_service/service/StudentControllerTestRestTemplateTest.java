@@ -46,6 +46,7 @@ public class StudentControllerTestRestTemplateTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
+
     @Test
     public void testGetStudentsByFaculty() {
         String url = "http://localhost:" + port + "/student/by-faculty?facultyId=1";

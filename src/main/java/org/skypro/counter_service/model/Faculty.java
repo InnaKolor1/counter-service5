@@ -50,6 +50,7 @@ public class Faculty {
         return color;
     }
 
+
     public void setColor(String color) {
         this.color = color;
     }

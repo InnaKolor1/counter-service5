@@ -7,6 +7,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "avatars")
 public class Avatar {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

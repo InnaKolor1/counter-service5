@@ -12,5 +12,4 @@ CREATE TABLE person (
     car_id BIGINT
 );
 
-
 ALTER TABLE person ADD CONSTRAINT fk_person_car FOREIGN KEY (car_id) REFERENCES car(id);

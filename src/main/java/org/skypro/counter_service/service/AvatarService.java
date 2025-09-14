@@ -6,5 +6,7 @@ import org.springframework.data.domain.PageRequest;
 
 public class AvatarService {
     public Page<Avatar> getAllAvatars(PageRequest of) {
+        return null;
     }
 }
+

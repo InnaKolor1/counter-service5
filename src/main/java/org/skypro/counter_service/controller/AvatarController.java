@@ -18,6 +18,7 @@ public class AvatarController {
         this.avatarService = avatarService;
     }
 
+
     @GetMapping
     public ResponseEntity<List<Avatar>> getAllAvatars(
             @RequestParam(defaultValue = "0") int page,
