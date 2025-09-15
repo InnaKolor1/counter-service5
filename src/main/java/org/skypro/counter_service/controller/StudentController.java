@@ -48,6 +48,7 @@ public class StudentController {
         return studentService.findByFacultyId(facultyId);
     }
 
+
     @GetMapping
     public List<Student> getAllStudents() {
         return studentService.getAll();

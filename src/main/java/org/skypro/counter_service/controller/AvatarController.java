@@ -19,6 +19,7 @@ public class AvatarController {
     }
 
 
+
     @GetMapping
     public ResponseEntity<List<Avatar>> getAllAvatars(
             @RequestParam(defaultValue = "0") int page,
