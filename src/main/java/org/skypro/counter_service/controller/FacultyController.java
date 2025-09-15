@@ -1,6 +1,5 @@
 package org.skypro.counter_service.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.skypro.counter_service.model.Faculty;
@@ -11,6 +10,7 @@ import java.util.List;
 @RequestMapping("/faculty")
 public class FacultyController {
     private final FacultyService facultyService;
+
 
     public FacultyController(FacultyService facultyService) {
         this.facultyService = facultyService;
