@@ -7,20 +7,19 @@ import java.util.List;
 import java.util.Objects;
 
 
+
 @Entity
-@Table(name = "faculty",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "color"}))
+@Table(name = "faculty")
 public class Faculty {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @Column(nullable = false)
     private String name;
 
-    @NotNull
+    @Column(nullable = false)
     private String color;
-
 
     public Faculty() {
     }
@@ -50,8 +49,27 @@ public class Faculty {
         return color;
     }
 
-
     public void setColor(String color) {
         this.color = color;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Faculty faculty = (Faculty) o;
+        return Objects.equals(id, faculty.id);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+    @Override
+    public String toString() {
+        return "Faculty{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                '}';
     }
 }

@@ -5,13 +5,18 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "students")
+@Table(name = "student")
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private int age;
+
     @ManyToOne
     @JoinColumn(name = "faculty_id")
     private Faculty faculty;
