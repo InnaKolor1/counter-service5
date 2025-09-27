@@ -13,18 +13,22 @@ import java.util.List;
 @RequestMapping("/avatar")
 public class AvatarController {
     private final AvatarService avatarService;
-
     public AvatarController(AvatarService avatarService) {
         this.avatarService = avatarService;
     }
 
+    @PostMapping
+    public Avatar uploadAvatar(@RequestBody Avatar avatar) {
+        return avatarService.saveAvatar(avatar);
+    }
 
+    @GetMapping("/student/{studentId}")
+    public Avatar getAvatarByStudentId(@PathVariable Long studentId) {
+        return avatarService.getAvatarByStudentId(studentId).orElse(null);
+    }
 
-    @GetMapping
-    public ResponseEntity<List<Avatar>> getAllAvatars(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<Avatar> avatarsPage = avatarService.getAllAvatars(PageRequest.of(page, size));
-        return ResponseEntity.ok(avatarsPage.getContent());
+    @DeleteMapping("/{id}")
+    public void deleteAvatar(@PathVariable Long id) {
+        avatarService.deleteAvatar(id);
     }
 }

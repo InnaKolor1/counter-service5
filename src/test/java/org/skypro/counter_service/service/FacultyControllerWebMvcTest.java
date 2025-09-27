@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.skypro.counter_service.controller.FacultyController;
@@ -19,63 +20,49 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@WebMvcTest(FacultyController.class)
-class FacultyControllerWebMvcTest {
+import java.util.Arrays;
+import java.util.List;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest
+class StudentControllerWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private FacultyService facultyService;
+    @MockBean
+    private StudentService studentService;
 
-    private Faculty testFaculty;
+    @Test
+    void getStudentNamesStartingWithA_ShouldReturnNames() throws Exception {
+        List<String> names = Arrays.asList("ALICE", "ANDREW", "ANNA");
+        when(studentService.getStudentNamesStartingWithA()).thenReturn(names);
 
-
-    @BeforeEach
-    void setUp() {
-        testFaculty = new Faculty();
-        testFaculty.setId(1L);
-        testFaculty.setName("Gryffindor");
-        testFaculty.setColor("Red");
+        mockMvc.perform(get("/student/names-starting-with-a"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[0]").value("ALICE"))
+                .andExpect(jsonPath("$[1]").value("ANDREW"))
+                .andExpect(jsonPath("$[2]").value("ANNA"));
     }
 
     @Test
-    void testGetByColor() throws Exception {
-        when(facultyService.getByColor("Red"))
-                .thenReturn(List.of(testFaculty));
+    void getStudentsAverageAge_ShouldReturnAverage() throws Exception {
+        when(studentService.getStudentsAverageAge()).thenReturn(20.5);
 
-
-        mockMvc.perform(get("/faculty/by-color")
-                        .param("color", "Red"))
+        mockMvc.perform(get("/student/average-age"))
                 .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$[0].id").value(1))
-                .andExpect((ResultMatcher) jsonPath("$[0].name").value("Gryffindor"))
-                .andExpect((ResultMatcher) jsonPath("$[0].color").value("Red"));
+                .andExpect(content().string("20.5"));
     }
 
     @Test
-    void testGetByName() throws Exception {
-        when(facultyService.getByName("Gryffindor"))
-                .thenReturn(List.of(testFaculty));
+    void calculateSumOptimized_ShouldReturnSum() throws Exception {
+        when(studentService.calculateSumOptimized()).thenReturn(500000L);
 
-        mockMvc.perform(get("/faculty/search")
-                        .param("nameOrColor", "Gryffindor"))
+        mockMvc.perform(get("/student/stream/sum-optimized"))
                 .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$[0].id").value(1))
-                .andExpect((ResultMatcher) jsonPath("$[0].name").value("Gryffindor"))
-                .andExpect((ResultMatcher) jsonPath("$[0].color").value("Red"));
-    }
-
-    @Test
-    void testSearchByNameOrColor() throws Exception {
-        when(facultyService.findByNameOrColor("Red"))
-                .thenReturn(List.of(testFaculty));
-
-        mockMvc.perform(get("/faculty/search")
-                        .param("nameOrColor", "Red"))
-                .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$[0].id").value(1))
-                .andExpect((ResultMatcher) jsonPath("$[0].name").value("Gryffindor"))
-                .andExpect((ResultMatcher) jsonPath("$[0].color").value("Red"));
+                .andExpect(content().string("500000"));
     }
 }
