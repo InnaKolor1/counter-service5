@@ -3,9 +3,8 @@ package org.skypro.counter_service.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
-class SchoolApplicationTests {
+class SchoolApplicationTest {
     @Test
     void contextLoads() {
     }
 }
-
