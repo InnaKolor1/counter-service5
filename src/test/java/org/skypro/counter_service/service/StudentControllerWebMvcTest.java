@@ -5,80 +5,116 @@ import org.junit.jupiter.api.Test;
 import org.skypro.counter_service.model.Faculty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.skypro.counter_service.controller.StudentController;
 import org.skypro.counter_service.model.Student;
 import org.springframework.test.web.servlet.ResultMatcher;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.http.MediaType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import org.skypro.counter_service.controller.StudentController;
+import org.skypro.counter_service.model.Student;
+import org.skypro.counter_service.service.AvatarService;
+import org.skypro.counter_service.service.FacultyService;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
+import java.util.Arrays;
+import java.util.List;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(StudentController.class)
-public class StudentControllerWebMvcTest {
+class StudentControllerWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockitoBean
     private StudentService studentService;
 
-    private Student testStudent;
-    private Faculty testFaculty;
+    @MockitoBean
+    private FacultyService facultyService;
 
-    @BeforeEach
-    void setUp() {
-        testFaculty = new Faculty();
-        testFaculty.setId(1L);
-        testFaculty.setName("Gryffindor");
-        testFaculty.setColor("Red");
+    @MockitoBean
+    private AvatarService avatarService;
 
-        testStudent = new Student();
-        testStudent.setId(1L);
-        testStudent.setName("Harry Potter");
-        testStudent.setAge(17);
-        testStudent.setFaculty(testFaculty);
+    @Test
+    void testGetStudent() throws Exception {
+        Student student = new Student();
+        student.setId(1L);
+        student.setName("Harry Potter");
+        student.setAge(17);
+
+        when(studentService.getStudentById(1L)).thenReturn(student);
+
+        mockMvc.perform(get("/students/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Harry Potter"))
+                .andExpect(jsonPath("$.age").value(17));
     }
 
     @Test
-    void testGetStudentById() throws Exception {
-        when(studentService.findById(1L)).thenReturn(testStudent);
+    void testCreateStudent() throws Exception {
+        Student student = new Student();
+        student.setName("Hermione Granger");
+        student.setAge(18);
 
+        Student createdStudent = new Student();
+        createdStudent.setId(1L);
+        createdStudent.setName("Hermione Granger");
+        createdStudent.setAge(18);
 
-        mockMvc.perform(get("/student/1"))
+        when(studentService.createStudent(any(Student.class))).thenReturn(createdStudent);
+
+        mockMvc.perform(post("/students")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(student)))
                 .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$.id").value(1))
-                .andExpect((ResultMatcher) jsonPath("$.name").value("Harry Potter"))
-                .andExpect((ResultMatcher) jsonPath("$.age").value(17))
-                .andExpect((ResultMatcher) jsonPath("$.faculty.name").value("Gryffindor"));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Hermione Granger"))
+                .andExpect(jsonPath("$.age").value(18));
     }
 
     @Test
-    void testGetStudentsByAgeBetween() throws Exception {
-        when(studentService.findByAgeBetween(16, 18)).thenReturn(List.of(testStudent));
+    void testGetStudentsByAge() throws Exception {
+        Student student1 = new Student();
+        student1.setId(1L);
+        student1.setName("Student1");
+        student1.setAge(17);
 
-        mockMvc.perform(get("/student/age-between")
-                        .param("minAge", "16")
-                        .param("maxAge", "18"))
+        Student student2 = new Student();
+        student2.setId(2L);
+        student2.setName("Student2");
+        student2.setAge(17);
+
+        List<Student> students = Arrays.asList(student1, student2);
+
+        when(studentService.getStudentsByAge(17)).thenReturn(students);
+
+        mockMvc.perform(get("/students").param("age", "17"))
                 .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$[0].id").value(1))
-                .andExpect((ResultMatcher) jsonPath("$[0].name").value("Harry Potter"));
+                .andExpect(jsonPath("$.length()").value(2));
     }
 
     @Test
-    void testGetStudentsByFaculty() throws Exception {
-        when(studentService.findByFacultyId(1L)).thenReturn(List.of(testStudent));
+    void testPrintStudentsParallel() throws Exception {
+        mockMvc.perform(get("/students/print-parallel"))
+                .andExpect(status().isOk());
+    }
 
-        mockMvc.perform(get("/student/by-faculty")
-                        .param("facultyId", "1"))
-                .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$[0].id").value(1))
-                .andExpect((ResultMatcher) jsonPath("$[0].name").value("Harry Potter"));
+    @Test
+    void testPrintStudentsSynchronized() throws Exception {
+        mockMvc.perform(get("/students/print-synchronized"))
+                .andExpect(status().isOk());
     }
 }

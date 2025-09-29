@@ -1,26 +1,22 @@
 package org.skypro.counter_service.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-
-import org.skypro.counter_service.model.Faculty;
+import org.springframework.http.HttpStatus;
 import org.skypro.counter_service.model.Student;
-import org.skypro.counter_service.resources.FacultyRepository;
-import org.skypro.counter_service.resources.StudentRepository;
-import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StudentControllerTestRestTemplateTest {
-
-
 
     @LocalServerPort
     private int port;
@@ -28,59 +24,81 @@ public class StudentControllerTestRestTemplateTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private StudentRepository studentRepository;
-
-    @Autowired
-    private FacultyRepository facultyRepository;
-
-    @BeforeEach
-    void setUp() {
-        studentRepository.deleteAll();
-        facultyRepository.deleteAll();
-
-        Faculty gryffindor = facultyRepository.save(new Faculty(null, "Gryffindor", "Red", null));
-        Faculty slytherin = facultyRepository.save(new Faculty(null, "Slytherin", "Green", null));
-
-        Student harry = new Student(null, "Harry Potter", 17, gryffindor);
-        Student hermione = new Student(null, "Hermione Granger", 18, gryffindor);
-        Student draco = new Student(null, "Draco Malfoy", 17, slytherin);
-
-        studentRepository.saveAll(List.of(harry, hermione, draco));
+    private String getBaseUrl() {
+        return "http://localhost:" + port + "/students";
     }
 
     @Test
-    public void testGetStudentsByAgeBetween() {
-        String url = "http://localhost:" + port + "/student/age-between?minAge=16&maxAge=18";
-        ResponseEntity<List> response = restTemplate.getForEntity(url, List.class);
+    void testCreateStudent() {
+        Student student = new Student();
+        student.setName("Harry Potter");
+        student.setAge(17);
 
-        Assertions.assertEquals(200, response.getStatusCodeValue());
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertEquals(3, response.getBody().size());
+        ResponseEntity<Student> response = restTemplate.postForEntity(
+                getBaseUrl(), student, Student.class);
 
-
-        List<Student> students = studentRepository.findByAgeBetween(16, 18);
-        Assertions.assertEquals(3, students.size());
-        Assertions.assertTrue(students.stream().anyMatch(s -> s.getName().equals("Harry Potter")));
-        Assertions.assertTrue(students.stream().anyMatch(s -> s.getName().equals("Hermione Granger")));
-        Assertions.assertTrue(students.stream().anyMatch(s -> s.getName().equals("Draco Malfoy")));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Harry Potter", response.getBody().getName());
     }
 
     @Test
-    public void testGetStudentsByFaculty() {
-        Faculty gryffindor = facultyRepository.findByNameIgnoreCase("Gryffindor").get(0);
+    void testGetStudent() {
+        Student student = new Student();
+        student.setName("Hermione Granger");
+        student.setAge(17);
+        ResponseEntity<Student> createResponse = restTemplate.postForEntity(
+                getBaseUrl(), student, Student.class);
+        Long studentId = createResponse.getBody().getId();
 
-        String url = "http://localhost:" + port + "/student/by-faculty?facultyId=" + gryffindor.getId();
-        ResponseEntity<List> response = restTemplate.getForEntity(url, List.class);
+        ResponseEntity<Student> response = restTemplate.getForEntity(
+                getBaseUrl() + "/" + studentId, Student.class);
 
-        Assertions.assertEquals(200, response.getStatusCodeValue());
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertEquals(2, response.getBody().size());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Hermione Granger", response.getBody().getName());
+    }
 
+    @Test
+    void testGetStudentsByAge() {
+        Student student = new Student();
+        student.setName("Ron Weasley");
+        student.setAge(17);
+        restTemplate.postForEntity(getBaseUrl(), student, Student.class);
 
-        List<Student> students = studentRepository.findByFacultyId(gryffindor.getId());
-        Assertions.assertEquals(2, students.size());
-        Assertions.assertTrue(students.stream().anyMatch(s -> s.getName().equals("Harry Potter")));
-        Assertions.assertTrue(students.stream().anyMatch(s -> s.getName().equals("Hermione Granger")));
+        ResponseEntity<Student[]> response = restTemplate.getForEntity(
+                getBaseUrl() + "?age=17", Student[].class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
+    void testPrintStudentsParallel() {
+        createTestStudents();
+
+        ResponseEntity<Void> response = restTemplate.getForEntity(
+                getBaseUrl() + "/print-parallel", Void.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testPrintStudentsSynchronized() {
+        createTestStudents();
+
+        ResponseEntity<Void> response = restTemplate.getForEntity(
+                getBaseUrl() + "/print-synchronized", Void.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    private void createTestStudents() {
+        for (int i = 1; i <= 6; i++) {
+            Student student = new Student();
+            student.setName("Test Student " + i);
+            student.setAge(20 + i);
+            restTemplate.postForEntity(getBaseUrl(), student, Student.class);
+        }
     }
 }

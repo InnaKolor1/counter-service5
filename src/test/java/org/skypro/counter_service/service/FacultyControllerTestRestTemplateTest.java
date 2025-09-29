@@ -1,25 +1,19 @@
 package org.skypro.counter_service.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-
 import org.skypro.counter_service.model.Faculty;
-import org.skypro.counter_service.resources.FacultyRepository;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class FacultyControllerTestRestTemplateTest {
+class FacultyControllerTestRestTemplateTest {
 
     @LocalServerPort
     private int port;
@@ -27,38 +21,70 @@ public class FacultyControllerTestRestTemplateTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private FacultyRepository facultyRepository;
+    private String getBaseUrl() {
+        return "http://localhost:" + port + "/faculty";
+    }
 
-    @BeforeEach
-    void setUp() {
+    @Test
+    void testGetFaculty() {
         Faculty faculty = new Faculty();
-        faculty.setName("Test");
+        faculty.setName("Gryffindor");
         faculty.setColor("Red");
-        facultyRepository.save(faculty);
+
+        ResponseEntity<Faculty> createResponse = restTemplate.postForEntity(
+                getBaseUrl(), faculty, Faculty.class);
+        Long facultyId = createResponse.getBody().getId();
+
+        ResponseEntity<Faculty> response = restTemplate.getForEntity(
+                getBaseUrl() + "/" + facultyId, Faculty.class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Gryffindor", response.getBody().getName());
     }
 
     @Test
-    public void testGetByName() {
-        String url = "http://localhost:" + port + "/faculty/by-name?name=Test";
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        assertTrue(response.getStatusCode().is2xxSuccessful());
-        assertTrue(response.getBody().contains("Test"));
+    void testGetByName() {
+        Faculty faculty = new Faculty();
+        faculty.setName("Ravenclaw");
+        faculty.setColor("Blue");
+        restTemplate.postForEntity(getBaseUrl(), faculty, Faculty.class);
+
+        ResponseEntity<Faculty[]> response = restTemplate.getForEntity(
+                getBaseUrl() + "?name=Ravenclaw", Faculty[].class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
     }
 
     @Test
-    public void testGetByColor() {
-        String url = "http://localhost:" + port + "/faculty/by-color?color=Red";
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        assertTrue(response.getStatusCode().is2xxSuccessful());
-        assertTrue(response.getBody().contains("Red"));
+    void testGetByColor() {
+        Faculty faculty = new Faculty();
+        faculty.setName("Hufflepuff");
+        faculty.setColor("Yellow");
+        restTemplate.postForEntity(getBaseUrl(), faculty, Faculty.class);
+
+        ResponseEntity<Faculty[]> response = restTemplate.getForEntity(
+                getBaseUrl() + "?color=Yellow", Faculty[].class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
     }
 
     @Test
-    public void testSearchWithNameOrColor() {
-        String url = "http://localhost:" + port + "/faculty/search?nameOrColor=Red";
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        assertTrue(response.getStatusCode().is2xxSuccessful());
-        assertTrue(response.getBody().contains("Red"));
+    void testGetStudentsByFaculty() {
+        Faculty faculty = new Faculty();
+        faculty.setName("Slytherin");
+        faculty.setColor("Green");
+
+        ResponseEntity<Faculty> createResponse = restTemplate.postForEntity(
+                getBaseUrl(), faculty, Faculty.class);
+        Long facultyId = createResponse.getBody().getId();
+
+        ResponseEntity<Object[]> response = restTemplate.getForEntity(
+                getBaseUrl() + "/" + facultyId + "/students", Object[].class);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
     }
 }

@@ -1,58 +1,62 @@
 package org.skypro.counter_service.service;
 
+import org.skypro.counter_service.repository.FacultyRepository;
 import org.springframework.stereotype.Service;
-
 import org.skypro.counter_service.model.Faculty;
-import org.skypro.counter_service.resources.FacultyRepository;
+
 import java.util.List;
+
+import java.util.Optional;
 
 
 
 @Service
 public class FacultyService {
+
     private final FacultyRepository facultyRepository;
 
     public FacultyService(FacultyRepository facultyRepository) {
         this.facultyRepository = facultyRepository;
     }
 
-    public Faculty create(Faculty faculty) {
-        return facultyRepository.save(faculty);
-
-
-    }
-
-    public Faculty read(long id) {
-        return facultyRepository.findById(id).orElse(null);
-    }
-
-    public Faculty update(Faculty faculty) {
-        return facultyRepository.save(faculty);
-
-
-    }
-
-    public Faculty delete(long id) {
-        Faculty faculty = read(id);
-        if (faculty != null) {
-            facultyRepository.deleteById(id);
+    public List<Faculty> findFacultiesByNameOrColor(String name, String color) {
+        if (name != null && color != null) {
+            return facultyRepository.findByNameContainingIgnoreCaseAndColorContainingIgnoreCase(name, color);
+        } else if (name != null) {
+            return facultyRepository.findByNameContainingIgnoreCase(name);
+        } else if (color != null) {
+            return facultyRepository.findByColorContainingIgnoreCase(color);
+        } else {
+            return facultyRepository.findAll();
         }
-        return faculty;
     }
 
-    public List<Faculty> getByColor(String color) {
-        return facultyRepository.findByColor(color);
+    public Faculty findFaculty(Long id) {
+        Optional<Faculty> faculty = facultyRepository.findById(id);
+        return faculty.orElse(null);
     }
 
-    public List<Faculty> getByName(String name) {
-        return facultyRepository.findByName(name);
+    public Faculty createFaculty(Faculty faculty) {
+        return facultyRepository.save(faculty);
     }
 
-    public List<Faculty> findByNameOrColor(String nameOrColor) {
-        return facultyRepository.findByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor);
+    public Faculty updateFaculty(Long id, Faculty faculty) {
+        Optional<Faculty> existingFaculty = facultyRepository.findById(id);
+        if (existingFaculty.isPresent()) {
+            faculty.setId(id);
+            return facultyRepository.save(faculty);
+        }
+        return null;
     }
 
-    public List<Faculty> getAll() {
+    public void deleteFaculty(Long id) {
+        facultyRepository.deleteById(id);
+    }
+    public List<Faculty> getAllFaculties() {
         return facultyRepository.findAll();
+    }
+
+    public Object searchFaculties(String gryffindor, String red) {
+        return gryffindor;
     }
 }

@@ -1,9 +1,11 @@
 package org.skypro.counter_service.model;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.*;
 
 import java.util.List;
 import java.util.Objects;
+import jakarta.validation.constraints.NotBlank;
 
 
 @Entity
@@ -12,19 +14,20 @@ public class Faculty {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String color;
-    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
-    private List<Student> students;
+
     public Faculty() {
     }
+
     public Faculty(Long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
     }
 
-    public Faculty(Object o, String gryffindor, String red, Object o1) {
+    public Faculty(String gryffindor, String red) {
     }
 
     public Long getId() {
@@ -44,19 +47,5 @@ public class Faculty {
     }
     public void setColor(String color) {
         this.color = color;
-    }
-    public List<Student> getStudents() {
-        return students;
-    }
-    public void setStudents(List<Student> students) {
-        this.students = students;
-    }
-    @Override
-    public String toString() {
-        return "Faculty{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                '}';
     }
 }
