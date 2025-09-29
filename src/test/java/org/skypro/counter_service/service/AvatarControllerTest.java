@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.skypro.counter_service.controller.AvatarController;
@@ -19,7 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @WebMvcTest
 class AvatarControllerTest {
 
@@ -29,13 +28,13 @@ class AvatarControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private AvatarService avatarService;
 
-    @MockBean
+    @MockitoBean
     private FacultyService facultyService;
 
-    @MockBean
+    @MockitoBean
     private StudentService studentService;
 
     @Test

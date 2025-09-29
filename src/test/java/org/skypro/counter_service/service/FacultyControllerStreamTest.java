@@ -3,11 +3,10 @@ package org.skypro.counter_service.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.skypro.counter_service.model.Faculty;
 import org.skypro.counter_service.service.FacultyService;
-
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,7 +20,7 @@ class FacultyControllerStreamTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private FacultyService facultyService;
 
     @Test
